@@ -1,0 +1,860 @@
+Arquivo: fts.info.yml
+Caminho: g:\Meu Drive\MLeva\drupal_module\drupal-rest-api-client\fts.info.yml
+========================================
+name: fts
+description: "Creates a page consuming HR rest web services."
+package: Custom
+type: module
+version: 1.0
+core_version_requirement: ^10
+
+
+
+Arquivo: fts.module
+Caminho: g:\Meu Drive\MLeva\drupal_module\drupal-rest-api-client\fts.module
+========================================
+<?php
+/**
+ * @file
+ *  API module.
+ */
+function fts_reponse($url, $method = 'GET', $params = array())
+{
+    $methods = [
+        'POST',
+        'GET',
+        'PUT',
+        'DELETE'
+    ];
+    $result = array();
+
+    try {
+        if (empty($url)) {
+            throw new Exception("Invalid url");
+        }
+        if (in_array(strtoupper($method), $methods) === FALSE) {
+            throw new Exception("Invalid method");
+        } else {
+
+            switch (strtoupper($method)) {
+                case 'GET':
+                case 'POST':
+                case 'PUT':
+                case 'DELETE':
+                    if (function_exists('fts_call_request')) {
+                        $result = fts_call_request($url, $method, $params);
+                    }
+                    break;
+                default:
+                    throw new Exception("Invalid method");
+                    break;
+            }
+        }
+    } catch (Exception $e) {
+        echo $e->getMessage();
+    }
+
+    return ($result);
+}
+
+function fts_call_request($requesturl, $method, $params = array())
+{
+
+    // request url
+    $url = $requesturl;
+
+    try {
+
+        // initialized curl
+        $ch = curl_init();
+
+        // set header for curl request
+        $headers = array(
+            "Cache-Control: no-cache",
+            "Pragma: no-cache"
+        );
+
+        // set required setting with curl configuration
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_FRESH_CONNECT, TRUE);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+        curl_setopt($ch, CURLOPT_FORBID_REUSE, 1);
+
+        // pass the additional values
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
+
+        // close the curl connection
+        $result = curl_exec($ch);
+        curl_close($ch);
+
+        return $result;
+    } catch (Exception $e) {
+        echo $e->getMessage();
+    }
+}
+
+
+/**
+ * Implements hook_theme().
+ */
+function fts_theme($existing, $type, $theme, $path) {
+    return [
+        'fts_compare_response' => [
+            'variables' => [
+                'products' => NULL,
+                'company' => NULL,
+                'user' => NULL,
+                'dateTime' => NULL,
+                'pagehtml' => NULL,
+            ],
+        ],
+        'fts_get_product_by_id' => [
+            'variables' => ['product' => NULL],
+        ],
+    ];
+}
+
+Arquivo: fts.routing.yml
+Caminho: g:\Meu Drive\MLeva\drupal_module\drupal-rest-api-client\fts.routing.yml
+========================================
+fts.mleva_post:
+  path: '/mleva-post'
+  defaults:
+    _controller: '\Drupal\fts\Controller\FtsController::postMleva'
+    _title: 'Post MLeva Data'
+  requirements:
+    _permission: 'access content'
+
+fts.product_get:
+  path: '/mleva-product/{gtin}'
+  defaults:
+    _controller: '\Drupal\fts\Controller\FtsController::getProductByGtin'
+    _title: 'Get Product by GTIN'
+  requirements:
+    _permission: 'access content'
+
+Arquivo: fts.services.yml
+Caminho: g:\Meu Drive\MLeva\drupal_module\drupal-rest-api-client\fts.services.yml
+========================================
+# Service definition in YAML.
+services:
+  fts.client:
+    class: Drupal\fts\Client\FtsClient
+    arguments: [ '@http_client', '@messenger' ]
+    
+
+Arquivo: .gitignore
+Caminho: g:\Meu Drive\MLeva\drupal_module\drupal-rest-api-client\.idea\.gitignore
+========================================
+# Default ignored files
+/shelf/
+/workspace.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+/drupal-rest-api-client.iml
+/php.xml
+./.idea/*
+
+
+Arquivo: php.xml
+Caminho: g:\Meu Drive\MLeva\drupal_module\drupal-rest-api-client\.idea\php.xml
+========================================
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="MessDetectorOptionsConfiguration">
+    <option name="transferred" value="true" />
+  </component>
+  <component name="PHPCSFixerOptionsConfiguration">
+    <option name="transferred" value="true" />
+  </component>
+  <component name="PHPCodeSnifferOptionsConfiguration">
+    <option name="highlightLevel" value="WARNING" />
+    <option name="transferred" value="true" />
+  </component>
+  <component name="PhpProjectSharedConfiguration" php_language_level="7.0">
+    <option name="suggestChangeDefaultLanguageLevel" value="false" />
+  </component>
+  <component name="PhpStanOptionsConfiguration">
+    <option name="transferred" value="true" />
+  </component>
+  <component name="PsalmOptionsConfiguration">
+    <option name="transferred" value="true" />
+  </component>
+</project>
+
+Arquivo: vcs.xml
+Caminho: g:\Meu Drive\MLeva\drupal_module\drupal-rest-api-client\.idea\vcs.xml
+========================================
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+  </component>
+</project>
+
+Arquivo: workspace.xml
+Caminho: g:\Meu Drive\MLeva\drupal_module\drupal-rest-api-client\.idea\workspace.xml
+========================================
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="61de0d6c-1cb5-4cdc-9bcb-264c60345f43" name="Changes" comment="Response post and get ok" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings">
+    <execution />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;gomesmr&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/gomesmr/drupal-rest-api-client.git&quot;,
+    &quot;accountId&quot;: &quot;d9fcc3cd-4da6-4b3c-aad9-87b00b8e323b&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 1
+}</component>
+  <component name="ProjectId" id="2loD678B94hAGLNXv44CIQ4Co6G" />
+  <component name="ProjectViewState">
+    <option name="autoscrollFromSource" value="true" />
+    <option name="compactDirectories" value="true" />
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="false" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-7c0b70fcd90d-JavaScript-PS-242.21829.154" />
+        <option value="bundled-php-predefined-a98d8de5180a-4d9f4c849d09-com.jetbrains.php.sharedIndexes-PS-242.21829.154" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="61de0d6c-1cb5-4cdc-9bcb-264c60345f43" name="Changes" comment="" />
+      <created>1725837358520</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1725837358520</updated>
+      <workItem from="1725837359959" duration="4609000" />
+    </task>
+    <task id="LOCAL-00001" summary="adding get endpoint product by id">
+      <option name="closed" value="true" />
+      <created>1725837421746</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1725837421746</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Response post and get ok">
+      <option name="closed" value="true" />
+      <created>1725841994672</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1725841994672</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="adding get endpoint product by id" />
+    <MESSAGE value="Response post and get ok" />
+    <option name="LAST_COMMIT_MESSAGE" value="Response post and get ok" />
+  </component>
+</project>
+
+Arquivo: FtsClientInterface.php
+Caminho: g:\Meu Drive\MLeva\drupal_module\drupal-rest-api-client\src\FtsClientInterface.php
+========================================
+<?php
+
+namespace Drupal\fts;
+interface FtsClientInterface
+{
+    /**
+     *
+     * @param string $method
+     *   get, post, patch, delete, etc. See Guzzle documentation.
+     * @param string $endpoint
+     *   The HR API endpoint
+     * @param array $query
+     *   Query string parameters the endpoint allows (ex. ['per_page' => 50]
+     * @param array $body (converted to JSON)
+     *   Utilized for some endpoints
+     * @return object
+     *   \GuzzleHttp\Psr7\Response body
+     */
+    public function connect($method, $endpoint, $query, $body);
+}
+
+Arquivo: FtsClient.php
+Caminho: g:\Meu Drive\MLeva\drupal_module\drupal-rest-api-client\src\Client\FtsClient.php
+========================================
+<?php
+
+namespace Drupal\fts\Client;
+
+use Drupal;
+use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\fts\FtsClientInterface;
+use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\RequestException;
+use Drupal\fts\Model\ApiResponse;
+use Drupal\fts\Model\Product;
+use Drupal\fts\Model\ProductGetId;
+use Drupal\fts\Model\Company;
+use Drupal\fts\Model\User;
+
+class FtsClient implements FtsClientInterface
+{
+
+    /**
+     * An http client.
+     *
+     * @var ClientInterface
+     */
+    protected $httpClient;
+
+    /**
+     * Base URI for the service.
+     *
+     * @var string
+     */
+    protected $base_uri;
+
+    /**
+     * Token for authentication.
+     *
+     * @var string
+     */
+    protected $token;
+
+    /**
+     * Secret for authentication.
+     *
+     * @var string
+     */
+    protected $secret;
+
+    /**
+     * Messenger service.
+     *
+     * @var MessengerInterface
+     */
+    protected $messenger;
+
+    /**
+     * Constructor.
+     *
+     * @param ClientInterface $http_client
+     *   The HTTP client.
+     * @param MessengerInterface $messenger
+     *   The messenger service for displaying messages.
+     */
+    public function __construct(ClientInterface $http_client, MessengerInterface $messenger)
+    {
+        $this->httpClient = $http_client;
+        $this->messenger = $messenger; // Now correctly injecting the messenger service
+        $this->base_uri = 'http://host.docker.internal:8081'; // Update to your actual service URL
+        $this->token = 'seu-token-aqui'; // Define your token
+        $this->secret = 'seu-segredo-aqui'; // Define your secret
+    }
+
+    /**
+     * Connect to the API.
+     *
+     * @param string $method
+     *   The HTTP method (GET, POST, etc).
+     * @param string $endpoint
+     *   The endpoint to connect to.
+     * @param array $query
+     *   Query string parameters.
+     * @param array $body
+     *   The request body.
+     *
+     * @return string|false
+     *   The response body or FALSE on failure.
+     */
+    public function connect($method, $endpoint, $query = [], $body = null)
+    {
+        try {
+            $options = $this->buildOptions($query, $body);
+
+            // Faz a requisição HTTP usando o Guzzle
+            $response = $this->httpClient->{$method}(
+                $this->base_uri . $endpoint,
+                $options
+            );
+
+            // Decodifica a resposta JSON
+            $data = json_decode($response->getBody()->getContents(), true);
+
+            // Verifica se é uma requisição GET ou POST
+            if ($method === 'post') {
+                // Mapeamento da resposta para o POST (por exemplo, comparando produtos)
+                $products = [];
+                foreach ($data['products'] as $productData) {
+                    $products[] = new Product($productData);
+                }
+
+                $company = new Company($data['company']);
+                $user = new User($data['user']);
+
+                return new ApiResponse($products, $company, $user, $data['dateTime']);
+
+            } else if ($method === 'get') {
+                // Mapeamento da resposta para o GET (por exemplo, buscar produto por GTIN)
+                return $data; // Retorna o produto diretamente, como JSON para mapear depois
+            }
+        } catch (RequestException $exception) {
+            $this->showMessage(t('Failed to complete task: %error', ['%error' => $exception->getMessage()]), 'error');
+            Drupal::logger('fts_api')->error('Failed to complete task: %error', ['%error' => $exception->getMessage()]);
+            return FALSE;
+        }
+    }
+
+    /**
+     * Build options for the HTTP client.
+     *
+     * @param array $query
+     *   The query string parameters.
+     * @param string $body
+     *   The request body.
+     *
+     * @return array
+     *   The options for the HTTP request.
+     */
+    private function buildOptions($query, $body)
+    {
+        $options = [];
+
+        // Adiciona o cabeçalho Content-Type para JSON
+        $options['headers'] = [
+            'Content-Type' => 'application/json',
+        ];
+
+        // Autenticação
+        $options['auth'] = $this->auth();
+
+        // Verifica se o body está no formato correto e converte para JSON, se necessário
+        if ($body) {
+            if (is_array($body)) {
+                // Converte o array PHP para uma string JSON
+                $options['body'] = json_encode($body);
+            } else {
+                $options['body'] = $body;
+            }
+        }
+
+        // Define os parâmetros de consulta, se existirem
+        if ($query) {
+            $options['query'] = $query;
+        }
+
+        return $options;
+    }
+
+    /**
+     * Authentication handler.
+     *
+     * @return array
+     *   Authentication credentials.
+     */
+    private function auth()
+    {
+        return [$this->token, $this->secret];
+    }
+
+    /**
+     * Show a message using the messenger service.
+     *
+     * @param string $message
+     *   The message to display.
+     * @param string $type
+     *   The message type (status, error, warning).
+     */
+    private function showMessage($message, $type = 'status')
+    {
+        $this->messenger->addMessage($message, $type);
+    }
+
+    /**
+     * Throttle the response.
+     *
+     * @param array $headers
+     *   The response headers.
+     *
+     * @return bool|void
+     *   TRUE if allowed, or sleep if throttling is needed.
+     */
+    private function throttle($headers)
+    {
+        print_r($headers['HR-Request-Rate-Count'][0]);
+        if ($headers['HR-Request-Rate-Count'][0] > 99) {
+            return sleep(60); // Throttle if more than 99 requests
+        }
+        return TRUE;
+    }
+}
+
+Arquivo: FtsController.php
+Caminho: g:\Meu Drive\MLeva\drupal_module\drupal-rest-api-client\src\Controller\FtsController.php
+========================================
+<?php
+
+namespace Drupal\fts\Controller;
+
+use Drupal\Core\Controller\ControllerBase;
+use Drupal\fts\Client\FtsClient;
+use Drupal\fts\Model\ProductGetId;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+/**
+ * Class MyController.
+ *
+ * @package Drupal\my_custom_module\Controller
+ */
+class FtsController extends ControllerBase
+{
+
+    /**
+     * Drupal\fts\Client\FtsClient definition.
+     *
+     * @var FtsClient
+     */
+    protected $ftsApiClient;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct(FtsClient $fts_api_client)
+    {
+        $this->ftsApiClient = $fts_api_client;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function create(ContainerInterface $container)
+    {
+        return new static(
+            $container->get('fts.client')
+        );
+    }
+
+    public function postMleva()
+    {
+        $endpoint = '/mleva';
+        $payload = [
+            'products' => [
+                ['gtin' => '7896075300205', 'price' => '36.89'],
+                ['gtin' => '7898955352168', 'price' => '22.99'],
+                ['gtin' => '7896075300793', 'price' => '30.99']
+            ],
+            'company' => [
+                'companyName' => 'Varejão',
+                'localization' => '-22.83512749482224, -45.2265350010767'
+            ],
+            'user' => [
+                'userName' => 'lobsom'
+            ]
+        ];
+
+        // Fazendo a requisição
+        $response = $this->ftsApiClient->connect('post', $endpoint, [], $payload);
+
+        if ($response) {
+            return [
+                '#theme' => 'fts_compare_response',
+                '#products' => $response->products ?? [],  // Certifica-se de que os produtos sejam passados
+                '#company' => $response->company ?? null,
+                '#user' => $response->user ?? null,
+                '#dateTime' => $response->dateTime ?? null,
+            ];
+        }
+
+        return [
+            '#markup' => 'Erro ao tentar recuperar dados.'
+        ];
+    }
+
+    /**
+     * Product by Id.
+     *
+     * @param string $gtin
+     *   The GTIN of the product.
+     *
+     * @return array
+     *   The product data or an error message.
+     */
+    public function getProductByGtin($gtin)
+    {
+        $endpoint = '/mleva/product/';
+        $query = ['gtin' => $gtin];
+
+        try {
+            $response = $this->ftsApiClient->connect('get', $endpoint, $query, null);
+
+            if ($response) {
+                $product = new ProductGetId($response);
+
+                return [
+                    '#theme' => 'fts_get_product_by_id',
+                    '#product' => $product,
+                ];
+            }
+
+            return ['#markup' => 'Produto não encontrado.'];
+
+        } catch (\Exception $exception) {
+            $this->messenger()->addError(t('Erro ao buscar o produto: @error', ['@error' => $exception->getMessage()]));
+            \Drupal::logger('fts_api')->error('Erro ao buscar o produto: %error', ['%error' => $exception->getMessage()]);
+            return ['#markup' => 'Erro ao buscar o produto.'];
+        }
+
+    }
+}
+
+
+
+Arquivo: ApiResponse.php
+Caminho: g:\Meu Drive\MLeva\drupal_module\drupal-rest-api-client\src\Model\ApiResponse.php
+========================================
+<?php
+
+namespace Drupal\fts\Model;
+
+
+class ApiResponse {
+    public $products = [];
+    public $company;
+    public $user;
+    public $dateTime;
+
+    public function __construct(array $products, Company $company, User $user, $dateTime) {
+        $this->products = $products;
+        $this->company = $company;
+        $this->user = $user;
+        $this->dateTime = $dateTime;
+    }
+}
+
+Arquivo: Company.php
+Caminho: g:\Meu Drive\MLeva\drupal_module\drupal-rest-api-client\src\Model\Company.php
+========================================
+<?php
+
+namespace Drupal\fts\Model;
+
+
+class Company
+{
+    public $companyName;
+    public $localization;
+
+    public function __construct(array $data) {
+        $this->companyName = $data['companyName'] ?? null;
+        $this->localization = $data['localization'] ?? null;
+    }
+}
+
+Arquivo: Product.php
+Caminho: g:\Meu Drive\MLeva\drupal_module\drupal-rest-api-client\src\Model\Product.php
+========================================
+<?php
+
+namespace Drupal\fts\Model;
+
+class Product
+{
+    public $gtin;
+    public $description;
+    public $index;
+    public $price;
+    public $volume;
+    public $quantity;
+    public $unity;
+    public $status;
+    public $marca; // Novo campo para a marca
+    public $apresentacao; // Novo campo para o sub-objeto apresentacao
+    public $validacao; // Novo campo para validacao
+
+    public function __construct(array $data)
+    {
+        // Atribuições do produto anterior
+        $this->gtin = $data['gtin'] ?? null;
+        $this->description = $data['description'] ?? $data['descricao'] ?? null; // Adaptando "description" ou "descricao"
+        $this->index = $data['index'] ?? null;
+        $this->price = $data['price'] ?? null;
+        $this->volume = $data['volume'] ?? $data['apresentacao']['volume'] ?? null; // Pega o volume dentro de apresentacao
+        $this->quantity = $data['quantity'] ?? $data['apresentacao']['itemQuantidade'] ?? null;
+        $this->unity = $data['unity'] ?? $data['apresentacao']['unidade'] ?? null;
+        $this->status = $data['status'] ?? null;
+
+        // Novos campos do novo formato
+        $this->marca = $data['marca'] ?? null;
+        $this->validacao = $data['validacao'] ?? null;
+
+        // Mapeando o objeto apresentacao, se existir
+        $this->apresentacao = isset($data['apresentacao']) ? new Apresentacao($data['apresentacao']) : null;
+    }
+}
+
+class Apresentacao
+{
+    public $embalagemTipoEntity;
+    public $embalagemQuantidade;
+    public $itemQuantidade;
+    public $volume;
+    public $unidade;
+
+    public function __construct(array $data)
+    {
+        $this->embalagemTipoEntity = $data['embalagemTipoEntity'] ?? null;
+        $this->embalagemQuantidade = $data['embalagemQuantidade'] ?? null;
+        $this->itemQuantidade = $data['itemQuantidade'] ?? null;
+        $this->volume = $data['volume'] ?? null;
+        $this->unidade = $data['unidade'] ?? null;
+    }
+}
+
+
+Arquivo: User.php
+Caminho: g:\Meu Drive\MLeva\drupal_module\drupal-rest-api-client\src\Model\User.php
+========================================
+<?php
+
+namespace Drupal\fts\Model;
+
+
+class User
+{
+    public $userName;
+
+    public function __construct(array $data) {
+        $this->userName = $data['userName'] ?? null;
+    }
+}
+
+Arquivo: ProductGetId.php
+Caminho: g:\Meu Drive\MLeva\drupal_module\drupal-rest-api-client\src\Model\ProductGetId.php
+========================================
+<?php
+
+namespace Drupal\fts\Model;
+
+class ProductGetId
+{
+    public $gtin;
+    public $descricao;
+    public $marca;
+    public $apresentacao; // Objeto 'apresentacao'
+    public $validacao;
+
+    public function __construct(array $data)
+    {
+        // Mapeamento direto dos campos do payload
+        $this->gtin = $data['gtin'] ?? null;
+        $this->descricao = $data['descricao'] ?? null;
+        $this->marca = $data['marca'] ?? null;
+        $this->validacao = $data['validacao'] ?? null;
+
+        // Mapeamento do objeto 'apresentacao'
+        $this->apresentacao = isset($data['apresentacao']) ? new Apresentacao($data['apresentacao']) : null;
+    }
+}
+
+class Apresentacao
+{
+    public $embalagemTipoEntity;
+    public $embalagemQuantidade;
+    public $itemQuantidade;
+    public $descricao;
+    public $volume;
+    public $unidade;
+
+    public function __construct(array $data)
+    {
+        // Mapeamento direto dos campos do objeto 'apresentacao'
+        $this->embalagemTipoEntity = $data['embalagemTipoEntity'] ?? null;
+        $this->embalagemQuantidade = $data['embalagemQuantidade'] ?? null;
+        $this->itemQuantidade = $data['itemQuantidade'] ?? null;
+        $this->descricao = $data['descricao'] ?? null; // Pode ser nulo
+        $this->volume = $data['volume'] ?? null;
+        $this->unidade = $data['unidade'] ?? null;
+    }
+}
+
+
+Arquivo: fts-compare-response.html.twig
+Caminho: g:\Meu Drive\MLeva\drupal_module\drupal-rest-api-client\templates\fts-compare-response.html.twig
+========================================
+<h1>Comparação de Produtos</h1>
+<p>Empresa: {{ company.companyName }}</p>
+<p>Usuário: {{ user.userName }} - Data: {{ dateTime }}</p>
+
+<ul>
+    {% for product in products %}
+        <li>
+            {{ product.description }} - Preço: {{ product.price }} - Quantidade: {{ product.quantity }} - Volume: {{ product.volume }} {{ product.unity }} - Status: {{ product.status }}
+        </li>
+    {% else %}
+        <li>Nenhum produto encontrado.</li>
+    {% endfor %}
+</ul>
+
+<pre>
+    {{ dump(company) }}
+    {{ dump(user) }}
+    {{ dump(dateTime) }}
+    {{ dump(products) }}
+</pre>
+
+Arquivo: fts-get-product-by-id.html.twig
+Caminho: g:\Meu Drive\MLeva\drupal_module\drupal-rest-api-client\templates\fts-get-product-by-id.html.twig
+========================================
+<h1>Produto: {{ product.gtin }}</h1>
+<p>Descrição: {{ product.descricao }}</p>
+<p>Marca: {{ product.marca }}</p>
+<p>Volume: {{ product.apresentacao.volume }} {{ product.apresentacao.unidade }}</p>
+<p>Quantidade: {{ product.apresentacao.itemQuantidade }}</p>
+<p>Validação: {{ product.validacao }}</p>
+

@@ -1,0 +1,175 @@
+package br.com.mleva.app.engine.unit
+
+import br.com.mleva.app.application.repository.mleva.entity.ProdutoEntity
+import org.springframework.stereotype.Component
+import java.util.Optional
+
+@Component
+class EngineUnit(
+    private val strategies: Map<String, UnitProcessingStrategy>
+) {
+
+    fun run(product: Optional<ProdutoEntity>, ncm: String?) {
+        val strategy = strategies[ncm] ?: throw IllegalArgumentException("No strategy found for NCM: $ncm")
+        strategy.process(product)
+    }
+}
+package br.com.mleva.app.engine.unit
+
+import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.stereotype.Component
+
+@Component
+@ConfigurationProperties(prefix = "regex.unidade.ncm-2202")
+class SodaPop(
+    val volume: ArrayList<String>,
+    val quantity: ArrayList<String>,
+) {
+
+    fun bottleVolume(descricao: String): Int {
+        var volume = 0
+        for (pattern in this.volume) {
+            if (checkRegexPresence(pattern, descricao)) {
+                val result = findRegexPattern(pattern, descricao)!!.toInt()
+                if (result > volume) volume = result
+            }
+        }
+        return volume
+    }
+
+    fun widthOfToiletPaper(descricao: String): Double {
+        var quantity = 0.0
+        for (pattern in this.quantity) {
+            if (checkRegexPresence(pattern, descricao)) {
+                val result = findRegexPattern(pattern, descricao)!!.toDouble()
+                if (result > quantity) quantity = result
+            }
+        }
+        return quantity
+    }
+
+    fun checkRegexPresence(pattern: String, productDescription: String): Boolean {
+        val regex = Regex(pattern = pattern, options = setOf(RegexOption.IGNORE_CASE))
+        return regex.containsMatchIn(productDescription)
+    }
+
+    fun findRegexPattern(pattern: String, productDescription: String): String? {
+        val regex = Regex(pattern = pattern, options = setOf(RegexOption.IGNORE_CASE))
+        return regex.find(productDescription)?.value?.let { extractValue(it) }
+    }
+
+    fun extractValue(stringWithValue: String): String? {
+        val regex = Regex(pattern = "\\d+", options = setOf(RegexOption.IGNORE_CASE))
+        return regex.find(stringWithValue)?.value
+    }
+}
+package br.com.mleva.app.engine.unit
+
+import br.com.mleva.app.application.enums.Unidade
+import br.com.mleva.app.application.repository.mleva.entity.ProdutoEntity
+import org.springframework.stereotype.Component
+import java.util.Optional
+
+@Component
+class SodaPopStrategy(private val sodaPop: SodaPop) : UnitProcessingStrategy {
+    override fun process(product: Optional<ProdutoEntity>) {
+//        val volume = sodaPop.bottleVolume(product.descricao!!)
+//        product.apresentacao!!.volume = volume.toDouble()
+//        product.apresentacao.unidade = Unidade.L
+    }
+}
+package br.com.mleva.app.engine.unit
+
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+
+@Configuration
+class StrategyConfig(
+    private val toiletPaperStrategy: ToiletPaperStrategy,
+    private val sodaPopStrategy: SodaPopStrategy
+) {
+
+    @Bean
+    fun strategies(): Map<String, UnitProcessingStrategy> {
+        return mapOf(
+            "4818" to toiletPaperStrategy,
+            "2202" to sodaPopStrategy
+        )
+    }
+}
+package br.com.mleva.app.engine.unit
+
+import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.stereotype.Component
+
+@Component
+@ConfigurationProperties(prefix = "regex.unidade.ncm-4818")
+class ToiletPaper (
+    val volume: ArrayList<String>,
+    val comprimento: ArrayList<String>,
+) {
+
+    fun quantityToiletPaper(descricao: String): Int {
+        var quantity = 0
+        for (pattern in this.volume) {
+            if (checkRegexPresence(pattern, descricao)) {
+                val result = findRegexPattern(pattern, descricao)!!.toInt()
+                if (result > quantity) quantity = result
+            }
+        }
+        return quantity
+    }
+
+    fun widthOfToiletPaper(descricao: String): Double {
+        var quantity = 0.0
+        for (pattern in comprimento) {
+            if (checkRegexPresence(pattern, descricao)) {
+                val result = findRegexPattern(pattern, descricao)!!.toDouble()
+                if (result > quantity) quantity = result
+            }
+        }
+        return quantity
+    }
+
+    fun checkRegexPresence(pattern: String, productDescription: String): Boolean {
+        val regex = Regex(pattern = pattern, options = setOf(RegexOption.IGNORE_CASE))
+        return regex.containsMatchIn(productDescription)
+    }
+
+    fun findRegexPattern(pattern: String, productDescription: String): String? {
+        val regex = Regex(pattern = pattern, options = setOf(RegexOption.IGNORE_CASE))
+        return regex.find(productDescription)?.value?.let { extractValue(it) }
+    }
+
+    fun extractValue(stringWithValue: String): String? {
+        val regex = Regex(pattern = "\\d+", options = setOf(RegexOption.IGNORE_CASE))
+        return regex.find(stringWithValue)?.value
+    }
+}
+package br.com.mleva.app.engine.unit
+
+import br.com.mleva.app.application.enums.Unidade
+import br.com.mleva.app.application.repository.mleva.entity.ProdutoEntity
+import org.springframework.stereotype.Component
+import java.util.Optional
+
+@Component
+class ToiletPaperStrategy(private val toiletPaper: ToiletPaper) : UnitProcessingStrategy {
+    override fun process(product: Optional<ProdutoEntity>) {
+        val quantity = product.get().descricao?.let { toiletPaper.quantityToiletPaper(it) }
+        val width = product.get().descricao?.let {toiletPaper.widthOfToiletPaper(it)}
+        val presentation = product.get().apresentacao
+        presentation?.itemQuantidade  = quantity
+        presentation?.volume = width
+        presentation?.unidade = Unidade.M
+    }
+}
+
+package br.com.mleva.app.engine.unit
+
+import br.com.mleva.app.application.repository.mleva.entity.ProdutoEntity
+import java.util.Optional
+
+interface UnitProcessingStrategy {
+    fun process(product: Optional<ProdutoEntity>)
+}
