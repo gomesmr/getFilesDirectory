@@ -18,6 +18,7 @@ def gather_files_by_extension(source_directory, output_file, file_extensions, ex
                         file_path = os.path.join(root, file)
 
                         # Escreve o nome e o caminho do arquivo no arquivo de saída
+                        outfile.write("-" * 40 + "\n")  # Separador para melhor leitura
                         outfile.write(f"Arquivo: {file}\n")
                         outfile.write(f"Caminho: {file_path}\n")
                         outfile.write("=" * 40 + "\n")  # Separador para melhor leitura
