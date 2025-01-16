@@ -101,9 +101,9 @@ exclude_file_names = []
 
 ## **How to Run**
 
-. Clone the repository.
-. Update the configuration in `config.py` as per your requirements.
-. Run the project:
+* Clone the repository.
+* Update the configuration in `config.py` as per your requirements.
+* Run the project:
 ```bash
 python main.py
 ```
