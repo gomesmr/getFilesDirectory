@@ -1,3 +1,4 @@
 /.idea/*
 # Ignore o diretório de saída
 /output/
+/diff.log
