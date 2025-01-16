@@ -1,3 +1,4 @@
+
 # **File Processing Project Documentation**
 
 This project is designed to process files from a specified directory, filter them based on user-defined criteria, and output the processed content to a file. The project follows clean code principles and adheres to the SOLID design principles for better maintainability and scalability.
@@ -41,7 +42,7 @@ Handles filtering logic for files and directories.
 file_filter = FileFilter(
     file_extensions=['conf'],
     exclude_extensions=['.md', '.gitignore', '.swp'],
-    exclude_file_names=['example.conf', 'test.conf'],
+    exclude_file_names=[],
     exclude_directories=['.git', '.idea', 'test', 'js']
 )
 ```
@@ -78,7 +79,7 @@ FileConverter.convert_to_utf8(file_path)
 
 ## **Configuration**
 
-The project uses a configuration file (`__init__.py`) to define the following parameters:
+The project uses a configuration file (`config.py`) to define the following parameters:
 - **`source_directory`**: Directory containing the files to be processed.
 - **`output_file`**: File where the processed content will be saved.
 - **`file_extensions`**: List of file extensions to include.
@@ -93,7 +94,7 @@ output_file = "output/apache.txt"
 file_extensions = ['conf']
 exclude_extensions = ['.md', '.gitignore', '.swp']
 exclude_directories = ['.git', '.idea', 'test', 'js']
-exclude_file_names = ['example.conf', 'test.conf']
+exclude_file_names = []
 ```
 
 ---
@@ -101,7 +102,7 @@ exclude_file_names = ['example.conf', 'test.conf']
 ## **How to Run**
 
 . Clone the repository.
-. Update the configuration in `__init__.py` as per your requirements.
+. Update the configuration in `config.py` as per your requirements.
 . Run the project:
 ```bash
 python main.py
@@ -135,11 +136,10 @@ Caminho: c:\Users\gomes\Downloads\123\apache2\another.conf
 
 ## **Release Notes**
 
-### **Version 1.0.0**
-- Initial release with modularized structure.
-- Added support for file filtering by extensions, names, and directories.
-- UTF-8 conversion for all processed files.
-- Output file generation with metadata and content.
+### **Version 1.1.0**
+- Refactored `Application` to load configurations from `config.py`.
+- Updated `output_file` to include a directory path for better organization.
+- Added support for excluding specific file names.
 
 ---
 
@@ -156,3 +156,4 @@ Caminho: c:\Users\gomes\Downloads\123\apache2\another.conf
 - Marcelo Renato Gomes
 
 For any issues or feature requests, please open an issue in the repository.
+
