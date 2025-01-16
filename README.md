@@ -1,4 +1,3 @@
-
 # **File Processing Project Documentation**
 
 This project is designed to process files from a specified directory, filter them based on user-defined criteria, and output the processed content to a file. The project follows clean code principles and adheres to the SOLID design principles for better maintainability and scalability.
@@ -21,6 +20,7 @@ This project is designed to process files from a specified directory, filter the
 The main entry point of the project. It orchestrates the file processing by configuring filters and invoking the processing logic.
 
 #### Example Usage:
+
 ```python
 if __name__ == "__main__":
     Application.run()
@@ -38,6 +38,7 @@ Handles filtering logic for files and directories.
 - Exclude specific directories.
 
 #### Example:
+
 ```python
 file_filter = FileFilter(
     file_extensions=['conf'],
@@ -59,6 +60,7 @@ Processes files based on the filters and writes the output to a specified file.
 - Writes file metadata and content to the output file.
 
 #### Example:
+
 ```python
 processor = FileProcessor(source_directory, output_file, file_filter)
 processor.process_files()
@@ -71,6 +73,7 @@ processor.process_files()
 Converts files to UTF-8 encoding to ensure compatibility.
 
 #### Example:
+
 ```python
 FileConverter.convert_to_utf8(file_path)
 ```
@@ -88,6 +91,7 @@ The project uses a configuration file (`config.py`) to define the following para
 - **`exclude_file_names`**: List of specific file names to exclude.
 
 #### Example Configuration:
+
 ```python
 source_directory = "c:\\Users\\gomes\\Downloads\\123\\apache2"
 output_file = "output/apache.txt"
@@ -101,9 +105,10 @@ exclude_file_names = []
 
 ## **How to Run**
 
-* Clone the repository.
-* Update the configuration in `config.py` as per your requirements.
-* Run the project:
+- Clone the repository.
+- Update the configuration in `config.py` as per your requirements.
+- Run the project:
+
 ```bash
 python main.py
 ```
@@ -119,6 +124,7 @@ The processed content will be saved in the file specified in the `output_file` c
 ---
 
 ## **Example Output**
+
 ```plaintext
 ----------------------------------------
 Arquivo: example.conf
