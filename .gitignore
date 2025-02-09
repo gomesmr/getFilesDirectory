@@ -2,3 +2,4 @@
 # Ignore o diretório de saída
 /output/
 /diff.log
+__pycache__/
