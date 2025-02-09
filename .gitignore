@@ -1,5 +1,5 @@
 /.idea/*
 # Ignore o diretório de saída
 /output/
-/diff.log
+diff.log
 __pycache__/
